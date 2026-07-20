@@ -343,10 +343,7 @@
       <div class="brand-venue">Colmiane</div>
       <div class="brand-activity">Tyrolienne</div>
     </div>
-    <div style="display:flex;align-items:center;gap:0.625rem;">
-      <div class="header-updated" id="header-updated"></div>
-      <button id="refresh-btn" title="Rafraîchir les données" style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:white;cursor:pointer;font-size:0.875rem;color:var(--muted);transition:border-color 0.15s,color 0.15s;">↻</button>
-    </div>
+    <div class="header-updated" id="header-updated"></div>
   </header>
 
   <!-- Hero: Today + Tomorrow -->
@@ -754,17 +751,6 @@ function renderUpcoming() {
 (async function init() {
   await loadAll();
   render();
-
-  // Manual refresh button
-  document.getElementById('refresh-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('refresh-btn');
-    btn.textContent = '⋯';
-    btn.style.pointerEvents = 'none';
-    await loadAll(true);
-    render();
-    btn.textContent = '↻';
-    btn.style.pointerEvents = '';
-  });
 
   // Auto-refresh every 4 hours
   setInterval(async () => {
