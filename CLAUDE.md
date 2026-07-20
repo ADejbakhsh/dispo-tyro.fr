@@ -28,23 +28,7 @@ No test suite, no build step, no linting configured.
 
 ### Data flow
 
-```
-Axess Shop (colmiane.axess.shop)
-  │
-  ├─ POST /api/TicketsV4TimeSlotApi/GetReservationTimeSlotsForCalendar
-  │     → monthly calendar overview (JSON): daily aggregates per date
-  │
-  └─ POST /fr/Products/Tickets/Contingent/{ProjNr}/{PoolNr}/{TicketTypeId}
-        → per-time-slot HTML page: 30-min slots, 16 places each (15 at 15:00)
-        → JS variable `timeSlots: [{time, availableSlots, total, ...}]`
-        → parsed via regex in `parse_time_slots()`
-  │
-  ▼
-api_client.py  ──export──►  data.json
-  │                           │
-  │              fetch()      ▼
-  └──────────────────────  index.html  (static dashboard, no server needed)
-```
+The Axess Shop provides two endpoints: a monthly calendar overview (JSON) and a per-time-slot Contingent page (HTML). `api_client.py` fetches both and can export to `data.json`, which the static `index.html` dashboard consumes at runtime.
 
 ### URL pattern (source of truth)
 
@@ -61,9 +45,7 @@ The Contingent page mirrors it (`Calendar` → `Contingent`). The JSON API lives
 
 ### Key architectural decisions
 
-- **No auth** — only needs `ASP.NET_SessionId` cookie (obtained by visiting the Calendar page) + `ci=fr` language cookie
 - **Session state is server-side** — the Contingent POST requires prior Calendar page visit to initialize session state. `_ensure_session()` handles this transparently.
 - **No JSON API for time slots** — per-slot data only exists in the HTML of the Contingent page, embedded as a JS object. Parsing is regex-based with multiple fallback patterns in `_TIMESLOT_PATTERNS`.
 - **`SUB_TYPE_ID = 1061`** (person type) is NOT encoded in the URL — it's discovered from the page HTML and is the one value that must be provided separately when using `from_url()`.
-- **Dashboard is fully static** — `index.html` fetches `data.json` at runtime. No web server, no build. The JSON includes an `_exported_at` timestamp used for the "last updated" display.
 - **15:00 slot has 15 capacity** (not 16) — this is a site quirk, not a bug. The dashboard chart uses a fixed `maxVal = 16` y-axis.
