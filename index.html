@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tyrolienne — Colmiane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #F6F4F1;
+    --text:      #1C1F23;
+    --muted:     #8B9DAF;
+    --blue:      #3B5D7A;
+    --blue-dim:  #5680A0;
+    --red:       #D14B35;
+    --warn:      #E08740;
+    --green:     #6B9070;
+    --border:    #E3DFDA;
+    --card:      #FFFFFF;
+    --bar-bg:    #E8E4E0;
+    --radius:    8px;
+    --radius-sm: 5px;
+  }
+
+  html {
+    font-size: 16px;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 1.75rem 1.25rem 3rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .dashboard {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .brand-venue {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .brand-activity {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .header-updated {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    color: var(--muted);
+  }
+
+  /* ── Hero: 2 cards ── */
+  .hero-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .hero-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .hero-card.today {
+    border-left: 3px solid var(--blue);
+  }
+  .hero-card.tomorrow {
+    border-left: 3px solid var(--border);
+  }
+  .hero-date {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: lowercase;
+  }
+  .hero-label-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .hero-number {
+    font-size: clamp(2.75rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+  }
+  .hero-number.is-warn { color: var(--warn); }
+  .hero-number.is-hot  { color: var(--red); }
+  .hero-number.is-none { color: var(--muted); }
+  .hero-sub {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .hero-minibar {
+    margin-top: 0.5rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bar-bg);
+    overflow: hidden;
+  }
+  .hero-minibar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--blue);
+    transition: width 0.4s ease;
+  }
+  .hero-minibar-fill.is-warn { background: var(--warn); }
+  .hero-minibar-fill.is-hot  { background: var(--red); }
+
+  /* ── Section titles ── */
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.625rem;
+  }
+
+  /* ── Line Chart ── */
+  .chart-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+  }
+  .chart-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .chart-line-reserved {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .chart-area {
+    fill: url(#areaGrad);
+  }
+  .chart-dot {
+    fill: white;
+    stroke: var(--blue);
+    stroke-width: 2.5;
+    transition: r 0.2s ease;
+  }
+  .chart-dot:hover { r: 7; }
+  .chart-dot.is-warn { stroke: var(--warn); fill: #FFF6F2; }
+  .chart-dot.is-hot  { stroke: var(--red); fill: #FFF4F3; }
+  .chart-dot.is-zero { stroke: var(--muted); fill: white; }
+  .chart-max-line {
+    stroke: var(--border);
+    stroke-width: 1;
+    stroke-dasharray: 6 4;
+  }
+  .chart-max-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--muted);
+  }
+  .chart-tick-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: var(--muted);
+    text-anchor: middle;
+  }
+  .chart-val-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    text-anchor: middle;
+  }
+  .chart-val-label.is-none { fill: var(--muted); }
+  .chart-legend {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.25rem;
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
+    color: var(--muted);
+  }
+  .chart-legend span { display: flex; align-items: center; gap: 0.3rem; }
+  .chart-legend-line {
+    width: 14px; height: 2px; border-radius: 1px; background: var(--blue);
+  }
+  .chart-legend-dash {
+    width: 14px; height: 0; border-top: 1px dashed var(--border);
+  }
+
+  /* ── Upcoming days strip ── */
+  .upcoming-strip {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .upcoming-strip::-webkit-scrollbar { height: 3px; }
+  .upcoming-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .day-chip {
+    flex: 0 0 auto;
+    min-width: 80px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.625rem 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .day-chip:hover {
+    border-color: var(--blue-dim);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+  .day-chip.active {
+    border-color: var(--blue);
+    border-width: 2px;
+    padding: calc(0.625rem - 1px) calc(0.75rem - 1px) calc(0.5rem - 1px);
+  }
+  .day-chip-name {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .day-chip-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.5625rem;
+    color: var(--muted);
+  }
+  .day-chip-num {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .day-chip-bar {
+    width: 100%;
+    height: 3px;
+    border-radius: 1.5px;
+    background: var(--bar-bg);
+    overflow: hidden;
+  }
+  .day-chip-bar-fill {
+    height: 100%;
+    border-radius: 1.5px;
+  }
+
+  /* ── Empty ── */
+  .empty-note {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    font-size: 0.625rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .footer a { color: var(--blue); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-minibar-fill { transition: none; }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 540px) {
+    body { padding: 1rem 0.875rem 2rem; }
+    .dashboard { gap: 1.25rem; }
+    .hero-row { gap: 0.5rem; }
+    .hero-card { padding: 1rem 1rem 0.875rem; }
+    .hero-number { font-size: 2.25rem; }
+    .day-chip { min-width: 68px; padding: 0.5rem 0.5rem 0.375rem; }
+    .day-chip-name { font-size: 0.625rem; }
+    .day-chip-num { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <div class="brand-venue">Colmiane</div>
+      <div class="brand-activity">Tyrolienne</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.625rem;">
+      <div class="header-updated" id="header-updated"></div>
+      <button id="refresh-btn" title="Rafraîchir les données" style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:white;cursor:pointer;font-size:0.875rem;color:var(--muted);transition:border-color 0.15s,color 0.15s;">↻</button>
+    </div>
+  </header>
+
+  <!-- Hero: Today + Tomorrow -->
+  <div class="hero-row" id="hero-row"></div>
+
+  <!-- Line chart: today's slots -->
+  <div>
+    <div class="section-title" id="chart-section-title">Fréquentation</div>
+    <div class="chart-wrap" id="chart-wrap">
+      <svg class="chart-svg" id="chart-svg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Courbe des réservations par créneau horaire">
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3B5D7A" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#3B5D7A" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="chart-legend">
+        <span><span class="chart-legend-line"></span> Réservés</span>
+        <span><span class="chart-legend-dash"></span> Capacité max (16)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming days -->
+  <div>
+    <div class="section-title">Jours à venir</div>
+    <div class="upcoming-strip" id="upcoming-strip"></div>
+  </div>
+
+  <!-- Empty fallback -->
+  <div class="empty-note" id="empty-note" hidden>Aucune donnée chargée. Lancez <code>python api_client.py --export</code> pour rafraîchir.</div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>35€ par personne · 12 créneaux de 30 min · 10:00–16:00</span>
+    <a href="https://colmiane.axess.shop/fr/Products/Tickets/Calendar/529/63/1122" target="_blank" rel="noopener">colmiane.axess.shop →</a>
+  </footer>
+</div>
+
+<script>
+/* ── State ── */
+const allData = {};   // { "2026-07-15": [slot, ...], ... }
+let sortedDates = [];
+let selectedDate = null; // "YYYY-MM-DD"
+
+/* ── DOM refs ── */
+const $heroRow       = document.getElementById('hero-row');
+const $chartSvg      = document.getElementById('chart-svg');
+const $upcomingStrip = document.getElementById('upcoming-strip');
+const $emptyNote     = document.getElementById('empty-note');
+const $headerUpdated = document.getElementById('header-updated');
+
+/* ── Helpers ── */
+const DAYS  = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
+                'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+
+function parseDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); }
+function fmtISO(d)    { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtShort(d)  { return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+function todayISO()   { return fmtISO(new Date()); }
+function tomorrowISO(){ const d=new Date(); d.setDate(d.getDate()+1); return fmtISO(d); }
+
+function totals(slots) {
+  if (!slots || !slots.length) return { reserved: 0, max: 0, pct: 0 };
+  const max = slots.reduce((s,sl) => s + sl.max, 0);
+  const reserved = slots.reduce((s,sl) => s + sl.reserved, 0);
+  return { reserved, max, pct: max > 0 ? reserved / max : 0 };
+}
+
+function pctClass(pct) {
+  if (pct >= 0.9) return 'is-hot';
+  if (pct >= 0.7) return 'is-warn';
+  return '';
+}
+
+/* ── Load ── */
+let lastFetchTime = null;
+const AUTO_REFRESH_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+async function loadAll(showFeedback = false) {
+  try {
+    // Cache-bust to avoid stale browser cache
+    const resp = await fetch(`data.json?t=${Date.now()}`);
+    const data = await resp.json();
+    Object.assign(allData, data);
+
+    // Remove keys not in fetched data (so deleted days disappear)
+    const fetchedKeys = new Set(Object.keys(data));
+    for (const k of Object.keys(allData)) {
+      if (!fetchedKeys.has(k) && !k.startsWith('_')) delete allData[k];
+    }
+    sortedDates = Object.keys(allData).filter(k => !k.startsWith('_')).sort();
+
+    // Read embedded timestamp if present
+    if (data._exported_at) {
+      lastFetchTime = new Date(data._exported_at);
+    } else {
+      lastFetchTime = new Date();
+    }
+  } catch {
+    // keep existing data on refresh failure
+  }
+
+  // Default selected: today if available, else first date.
+  // If today only has 1-2 remaining slots (late in the day, limited info),
+  // prefer the next upcoming day with a fuller schedule for the chart.
+  const today = todayISO();
+  if (allData[today]) {
+    selectedDate = today;
+    const todaySlots = allData[today];
+    if (todaySlots && todaySlots.length <= 2 && sortedDates.length > 1) {
+      for (const d of sortedDates) {
+        if (d > today && allData[d] && allData[d].length >= 4) {
+          selectedDate = d;
+          break;
+        }
+      }
+    }
+  } else if (sortedDates.length > 0) {
+    selectedDate = sortedDates[0];
+  } else {
+    selectedDate = null;
+  }
+}
+
+function timeAgo(d) {
+  const mins = Math.floor((new Date() - d) / 60000);
+  if (mins < 1) return "à l'instant";
+  if (mins < 60) return `il y a ${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `il y a ${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  return `il y a ${days}j`;
+}
+
+/* ── Render ── */
+function render() {
+  if (sortedDates.length === 0) {
+    $emptyNote.hidden = false;
+    $headerUpdated.textContent = '';
+    return;
+  }
+  $emptyNote.hidden = true;
+  if (lastFetchTime) {
+    $headerUpdated.textContent = `Données ${timeAgo(lastFetchTime)}`;
+  } else {
+    $headerUpdated.textContent = '';
+  }
+
+  renderHero();
+  renderChart();
+  renderUpcoming();
+}
+
+/* ── Hero row ── */
+function renderHero() {
+  const today   = allData[todayISO()];
+  const tomorrow = allData[tomorrowISO()];
+  $heroRow.innerHTML = '';
+
+  [ { slots: today,    label: "Aujourd'hui", cls: 'today',    dateIso: todayISO()    },
+    { slots: tomorrow, label: 'Demain',       cls: 'tomorrow', dateIso: tomorrowISO() }
+  ].forEach(({slots, label, cls, dateIso}) => {
+    const d = parseDate(dateIso);
+    const t = slots ? totals(slots) : null;
+
+    const card = document.createElement('div');
+    card.className = `hero-card ${cls}`;
+
+    let numHtml, subHtml, barHtml = '';
+
+    if (!t || t.max === 0) {
+      numHtml = `<div class="hero-number is-none">—</div>`;
+      subHtml = `<div class="hero-sub">Pas de données</div>`;
+    } else {
+      const numCls = pctClass(t.pct);
+      numHtml = `<div class="hero-number ${numCls}">${t.reserved}</div>`;
+      const pctDisplay = Math.round(t.pct * 100);
+      subHtml = `<div class="hero-sub"><strong>${t.reserved}</strong> réservé${t.reserved>1?'s':''} sur <strong>${t.max}</strong> · ${pctDisplay}%</div>`;
+      const barCls = pctClass(t.pct);
+      barHtml = `<div class="hero-minibar"><div class="hero-minibar-fill ${barCls}" style="width:${Math.min(pctDisplay,100)}%"></div></div>`;
+    }
+
+    card.innerHTML = `
+      <div class="hero-date">${label} · ${fmtShort(d)}</div>
+      ${numHtml}
+      ${subHtml}
+      ${barHtml}
+    `;
+    $heroRow.appendChild(card);
+  });
+
+  // If tomorrow not in data, mark it
+  if (!tomorrow) {
+    const tomorrowCard = $heroRow.querySelector('.tomorrow');
+    if (tomorrowCard) {
+      tomorrowCard.querySelector('.hero-number').textContent = '—';
+      tomorrowCard.querySelector('.hero-number').className = 'hero-number is-none';
+      tomorrowCard.querySelector('.hero-sub').innerHTML = 'En attente…';
+    }
+  }
+}
+
+/* ── Line chart (today's slots) ── */
+function renderChart() {
+  const chartDate = selectedDate && allData[selectedDate]
+    ? selectedDate
+    : (allData[todayISO()] ? todayISO() : null);
+  const slots = chartDate ? allData[chartDate] : null;
+
+  // Clear SVG (keep <defs>)
+  const svg = $chartSvg;
+  // Remove all children except defs
+  while (svg.children.length > 1) svg.removeChild(svg.lastChild);
+  // Also clear defs except the first (areaGrad)
+  const defs = svg.querySelector('defs');
+  while (defs.children.length > 1) defs.removeChild(defs.lastChild);
+
+  // Update chart section title to reflect the displayed date
+  const $chartTitle = document.getElementById('chart-section-title');
+  if (chartDate) {
+    const cd = parseDate(chartDate);
+    const isToday = chartDate === todayISO();
+    const isTomorrow = chartDate === tomorrowISO();
+    let label;
+    if (isToday) label = "aujourd'hui";
+    else if (isTomorrow) label = 'demain';
+    else label = fmtShort(cd);
+    $chartTitle.textContent = `Fréquentation ${label}`;
+  } else {
+    $chartTitle.textContent = 'Fréquentation';
+  }
+
+  if (!slots || !slots.length) {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', '360'); text.setAttribute('y', '110');
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', 'var(--muted)'); text.setAttribute('font-size', '12');
+    text.setAttribute('font-family', 'DM Sans, sans-serif');
+    text.textContent = 'Aucune donnée pour le graphique.';
+    svg.appendChild(text);
+    return;
+  }
+
+  const W = 720, H = 220;
+  const padL = 44, padR = 20, padT = 30, padB = 28;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const n = slots.length;
+  const maxVal = 16; // fixed max per slot for the y-axis
+
+  // Scales
+  function x(i) { return padL + (n > 1 ? i / (n - 1) : 0.5) * plotW; }
+  function y(v) { return padT + plotH - (v / maxVal) * plotH; }
+
+  // Y-axis ticks
+  [0, 4, 8, 12, 16].forEach(v => {
+    const yy = y(v);
+    // Grid line
+    const grid = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    grid.setAttribute('x1', padL); grid.setAttribute('x2', W - padR);
+    grid.setAttribute('y1', yy); grid.setAttribute('y2', yy);
+    grid.setAttribute('stroke', v === 0 ? 'var(--border)' : 'var(--bar-bg)');
+    grid.setAttribute('stroke-width', v === 0 ? '1' : '1');
+    grid.setAttribute('stroke-dasharray', v === 0 ? '' : '4 4');
+    svg.appendChild(grid);
+    // Tick label
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', padL - 8); lbl.setAttribute('y', yy + 4);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('class', 'chart-tick-label');
+    lbl.textContent = v;
+    svg.appendChild(lbl);
+  });
+
+  // Max capacity dashed reference line at y=16
+  const maxY = y(16);
+  const maxLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  maxLine.setAttribute('x1', padL); maxLine.setAttribute('x2', W - padR);
+  maxLine.setAttribute('y1', maxY); maxLine.setAttribute('y2', maxY);
+  maxLine.setAttribute('class', 'chart-max-line');
+  svg.appendChild(maxLine);
+  const maxLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  maxLbl.setAttribute('x', W - padR); maxLbl.setAttribute('y', maxY - 6);
+  maxLbl.setAttribute('text-anchor', 'end');
+  maxLbl.setAttribute('class', 'chart-max-label');
+  maxLbl.textContent = 'max 16';
+  svg.appendChild(maxLbl);
+
+  // Build the line path and area path
+  const points = slots.map((s, i) => ({ x: x(i), y: y(s.reserved), v: s.reserved }));
+  const lineD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+
+  // Area fill (line + bottom corners)
+  const areaD = lineD +
+    ` L ${points[points.length - 1].x.toFixed(1)} ${y(0)}` +
+    ` L ${points[0].x.toFixed(1)} ${y(0)} Z`;
+
+  const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  area.setAttribute('d', areaD);
+  area.setAttribute('class', 'chart-area');
+  svg.appendChild(area);
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  line.setAttribute('d', lineD);
+  line.setAttribute('class', 'chart-line-reserved');
+  svg.appendChild(line);
+
+  // Dots + value labels + time labels
+  slots.forEach((slot, i) => {
+    const px = x(i);
+    const py = y(slot.reserved);
+    const pct = slot.max > 0 ? slot.reserved / slot.max : 0;
+
+    // Dot
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.setAttribute('r', '4.5');
+    let dotCls = 'chart-dot';
+    if (slot.reserved === 0) dotCls += ' is-zero';
+    else if (pct >= 0.9) dotCls += ' is-hot';
+    else if (pct >= 0.7) dotCls += ' is-warn';
+    dot.setAttribute('class', dotCls);
+    dot.setAttribute('aria-label', `${slot.time}: ${slot.reserved} réservés`);
+    svg.appendChild(dot);
+
+    // Value label above dot
+    const vlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    vlbl.setAttribute('x', px); vlbl.setAttribute('y', py - 10);
+    vlbl.setAttribute('class', `chart-val-label${slot.reserved === 0 ? ' is-none' : ''}`);
+    vlbl.setAttribute('fill', pct >= 0.9 ? 'var(--red)' : pct >= 0.7 ? 'var(--warn)' : 'var(--text)');
+    vlbl.textContent = slot.reserved;
+    svg.appendChild(vlbl);
+
+    // Time label at bottom
+    const tlbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tlbl.setAttribute('x', px); tlbl.setAttribute('y', H - 6);
+    tlbl.setAttribute('class', 'chart-tick-label');
+    tlbl.textContent = slot.time;
+    svg.appendChild(tlbl);
+  });
+}
+
+/* ── Upcoming strip ── */
+function renderUpcoming() {
+  $upcomingStrip.innerHTML = '';
+
+  // Show next 14 days from today
+  const today = new Date();
+  const days = [];
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    days.push(fmtISO(d));
+  }
+
+  days.forEach(dateIso => {
+    const d = parseDate(dateIso);
+    const slots = allData[dateIso];
+    const t = slots ? totals(slots) : null;
+    const isActive = dateIso === selectedDate;
+
+    const chip = document.createElement('div');
+    chip.className = `day-chip${isActive ? ' active' : ''}`;
+    chip.title = t ? `${t.reserved}/${t.max} réservés` : 'Pas de données';
+
+    let numHtml, barHtml;
+    if (!t || t.max === 0) {
+      numHtml = `<div class="day-chip-num" style="color:var(--muted)">—</div>`;
+      barHtml = '';
+    } else {
+      const numCls = pctClass(t.pct);
+      numHtml = `<div class="day-chip-num" style="color:${t.pct >= 0.9 ? 'var(--red)' : t.pct >= 0.7 ? 'var(--warn)' : 'var(--text)'}">${t.reserved}</div>`;
+      const barCls = pctClass(t.pct);
+      const barColor = t.pct >= 0.9 ? 'var(--red)' : t.pct >= 0.7 ? 'var(--warn)' : 'var(--blue)';
+      barHtml = `<div class="day-chip-bar"><div class="day-chip-bar-fill ${barCls}" style="width:${Math.min(Math.round(t.pct * 100), 100)}%;background:${barColor}"></div></div>`;
+    }
+
+    const isTodayDate = dateIso === todayISO();
+    const isTomorrowDate = dateIso === tomorrowISO();
+    let nameLabel = fmtShort(d);
+    if (isTodayDate) nameLabel = "Aujourd'hui";
+    else if (isTomorrowDate) nameLabel = 'Demain';
+
+    chip.innerHTML = `
+      <div class="day-chip-name">${nameLabel}</div>
+      <div class="day-chip-date">${dateIso}</div>
+      ${numHtml}
+      ${barHtml || '<div style="height:3px"></div>'}
+    `;
+
+    chip.addEventListener('click', () => {
+      if (allData[dateIso]) {
+        selectedDate = dateIso;
+        render();
+      }
+    });
+
+    $upcomingStrip.appendChild(chip);
+  });
+}
+
+/* ── Init ── */
+(async function init() {
+  await loadAll();
+  render();
+
+  // Manual refresh button
+  document.getElementById('refresh-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('refresh-btn');
+    btn.textContent = '⋯';
+    btn.style.pointerEvents = 'none';
+    await loadAll(true);
+    render();
+    btn.textContent = '↻';
+    btn.style.pointerEvents = '';
+  });
+
+  // Auto-refresh every 4 hours
+  setInterval(async () => {
+    await loadAll();
+    render();
+  }, AUTO_REFRESH_MS);
+
+  // Update relative time display every minute
+  setInterval(() => {
+    if (lastFetchTime) {
+      $headerUpdated.textContent = `Données ${timeAgo(lastFetchTime)}`;
+    }
+  }, 60000);
+})();
+</script>
+</body>
+</html>
