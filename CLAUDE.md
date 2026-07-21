@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Scrapes real-time reservation/availability data for the **TYROLIENNE** (zip line) activity at Colmiane from the Axess Shop ticketing platform. Two deliverables:
 
 - **Python client** (`api_client.py`) — fetches data from the Axess Shop and exports to JSON
-- **Static dashboard** (`index.html`) — renders the JSON as an interactive chart + day strip
+- **Static dashboard** (`index.html`) — renders the JSON as hero cards (yesterday/today/tomorrow), an interactive chart, and an upcoming-days strip
 
 ## Commands
 
@@ -49,3 +49,4 @@ The Contingent page mirrors it (`Calendar` → `Contingent`). The JSON API lives
 - **No JSON API for time slots** — per-slot data only exists in the HTML of the Contingent page, embedded as a JS object. Parsing is regex-based with multiple fallback patterns in `_TIMESLOT_PATTERNS`.
 - **`SUB_TYPE_ID = 1061`** (person type) is NOT encoded in the URL — it's discovered from the page HTML and is the one value that must be provided separately when using `from_url()`.
 - **15:00 slot has 15 capacity** (not 16) — this is a site quirk, not a bug. The dashboard chart uses a fixed `maxVal = 16` y-axis.
+- **Past-date data preservation** — the API stops returning time slots for past dates. `--export` merges today's morning slots with the previous export, and carries forward yesterday's final reservation snapshot so the dashboard always shows the previous day's totals.
