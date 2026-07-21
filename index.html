@@ -87,7 +87,7 @@
   /* ── Hero: 2 cards ── */
   .hero-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 0.75rem;
   }
   .hero-card {
@@ -104,6 +104,9 @@
   }
   .hero-card.tomorrow {
     border-left: 3px solid var(--border);
+  }
+  .hero-card.yesterday {
+    border-left: 3px solid var(--green);
   }
   .hero-date {
     font-size: 0.75rem;
@@ -379,7 +382,7 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <span>35€ par personne · 12 créneaux de 30 min · 10:00–16:00</span>
+	  <span></span>
     <a href="https://colmiane.axess.shop/fr/Products/Tickets/Calendar/529/63/1122" target="_blank" rel="noopener">colmiane.axess.shop →</a>
   </footer>
 </div>
@@ -407,6 +410,7 @@ function fmtISO(d)    { return `${d.getFullYear()}-${String(d.getMonth()+1).padS
 function fmtShort(d)  { return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
 function todayISO()   { return fmtISO(new Date()); }
 function tomorrowISO(){ const d=new Date(); d.setDate(d.getDate()+1); return fmtISO(d); }
+function yesterdayISO(){ const d=new Date(); d.setDate(d.getDate()-1); return fmtISO(d); }
 
 function totals(slots) {
   if (!slots || !slots.length) return { reserved: 0, max: 0, pct: 0 };
@@ -502,12 +506,14 @@ function render() {
 
 /* ── Hero row ── */
 function renderHero() {
-  const today   = allData[todayISO()];
-  const tomorrow = allData[tomorrowISO()];
+  const today     = allData[todayISO()];
+  const tomorrow   = allData[tomorrowISO()];
+  const yesterday  = allData[yesterdayISO()];
   $heroRow.innerHTML = '';
 
-  [ { slots: today,    label: "Aujourd'hui", cls: 'today',    dateIso: todayISO()    },
-    { slots: tomorrow, label: 'Demain',       cls: 'tomorrow', dateIso: tomorrowISO() }
+  [ { slots: yesterday, label: 'Hier',         cls: 'yesterday', dateIso: yesterdayISO() },
+    { slots: today,     label: "Aujourd'hui",  cls: 'today',     dateIso: todayISO()     },
+    { slots: tomorrow,  label: 'Demain',        cls: 'tomorrow',  dateIso: tomorrowISO()  }
   ].forEach(({slots, label, cls, dateIso}) => {
     const d = parseDate(dateIso);
     const t = slots ? totals(slots) : null;

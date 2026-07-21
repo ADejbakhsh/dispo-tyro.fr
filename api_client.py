@@ -21,7 +21,7 @@ The Contingent (time-slot) page mirrors the Calendar URL:
 
 import re
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -393,7 +393,7 @@ class AxessShopClient:
                 })
         return result
 
-    def get_all_upcoming_slots(self, num_days: int = 30) -> dict:
+    def get_all_upcoming_slots(self, num_days: int = 14) -> dict:
         """Get detailed time slot data for all upcoming days.
 
         Fetches the calendar overview first, then for each upcoming day
@@ -443,9 +443,44 @@ class AxessShopClient:
         return result
 
 
+def _merge_today_slots(old_data: dict, new_data: dict) -> dict:
+    """Merge today's time slots from old and new exports.
+
+    As the day progresses, past time slots disappear from the server.
+    This preserves morning slots from a previous export while updating
+    future slots with fresh data.
+
+    Args:
+        old_data: Previously exported data dict (dates → slots).
+        new_data: Freshly fetched data dict (dates → slots).
+
+    Returns:
+        Merged dict with today's slots combined from both sources.
+    """
+    today_str = date.today().isoformat()
+    old_today = old_data.get(today_str)
+    new_today = new_data.get(today_str)
+
+    if not old_today or not new_today:
+        return new_data  # nothing to merge
+
+    # Build merged: start with old slots, overwrite with new by matching time
+    merged_slots = {s["time"]: s for s in old_today}
+    for s in new_today:
+        merged_slots[s["time"]] = s  # new data wins for same time
+
+    result = dict(new_data)  # copy — all non-today dates from fresh fetch
+    result[today_str] = sorted(merged_slots.values(), key=lambda s: s["time"])
+    return result
+
+
 def export_to_json(client: AxessShopClient = None, filepath: str = "data.json",
-                    num_days: int = 30) -> str:
+                    num_days: int = 14) -> str:
     """Export availability data to a JSON file for the dashboard.
+
+    If data.json already exists, today's time slots are merged with the
+    previous export so that morning slots (which disappear from the server
+    as the day goes on) are preserved.
 
     Args:
         client: AxessShopClient instance. Created via from_url() if not provided.
@@ -473,14 +508,39 @@ def export_to_json(client: AxessShopClient = None, filepath: str = "data.json",
         else:
             print(f"  {date_str}: No data")
 
+    # Merge today's slots with previous export to preserve past time slots.
+    # Also carry forward yesterday's data — the API stops returning slots
+    # for past dates, but we want the final reservation count for display.
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            old_data = json.load(f)
+        # Remove metadata keys before merging
+        old_data = {k: v for k, v in old_data.items() if not k.startswith("_")}
+        merged = _merge_today_slots(old_data, clean)
+
+        merged_count = len(merged.get(date.today().isoformat(), []))
+        clean_count = len(clean.get(date.today().isoformat(), []))
+        if merged_count > clean_count:
+            print(f"  Preserved {merged_count - clean_count} past slot(s) for today from previous export")
+
+        # Preserve yesterday's data (API stops returning past dates)
+        yesterday_str = (date.today() - timedelta(days=1)).isoformat()
+        if yesterday_str in old_data and yesterday_str not in merged:
+            merged[yesterday_str] = old_data[yesterday_str]
+            print(f"  Preserved yesterday's data ({yesterday_str}) from previous export")
+
+        clean = merged
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass  # no previous data to merge, use fresh data as-is
+
     # Embed export timestamp for the dashboard
     clean["_exported_at"] = datetime.now().isoformat()
 
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(clean, f, ensure_ascii=False, indent=2)
 
-    total_dates = len(clean)
-    total_slots = sum(len(v) for v in clean.values())
+    total_dates = len([k for k in clean if not k.startswith("_")])
+    total_slots = sum(len(v) for k, v in clean.items() if not k.startswith("_"))
     print(f"Exported {total_dates} dates ({total_slots} slots) to {filepath}")
     return filepath
 
@@ -561,7 +621,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) > 1 and sys.argv[1] == "--export":
-        days = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+        days = int(sys.argv[2]) if len(sys.argv) > 2 else 14
         export_to_json(num_days=days)
     else:
         main()
