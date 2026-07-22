@@ -62,15 +62,15 @@
     },
     {
       "time": "15:30",
-      "available": 16,
+      "available": 11,
       "max": 16,
-      "reserved": 0
+      "reserved": 5
     },
     {
       "time": "16:00",
-      "available": 16,
+      "available": 14,
       "max": 16,
-      "reserved": 0
+      "reserved": 2
     }
   ],
   "2026-07-23": [
@@ -248,9 +248,9 @@
     },
     {
       "time": "12:00",
-      "available": 14,
+      "available": 12,
       "max": 16,
-      "reserved": 2
+      "reserved": 4
     },
     {
       "time": "13:00",
@@ -1109,5 +1109,5 @@
       "reserved": 0
     }
   ],
-  "_exported_at": "2026-07-22T12:58:13.089997"
+  "_exported_at": "2026-07-22T14:53:28.251028"
 }
