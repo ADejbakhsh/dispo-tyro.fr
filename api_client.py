@@ -463,8 +463,18 @@ def _merge_today_slots(old_data: dict, new_data: dict) -> dict:
     old_today = old_data.get(today_str)
     new_today = new_data.get(today_str)
 
-    if not old_today or not new_today:
+    if not old_today and not new_today:
         return new_data  # nothing to merge
+
+    if not new_today:
+        # API returned no slots for today (all passed), keep old data
+        result = dict(new_data)
+        result[today_str] = old_today
+        return result
+
+    if not old_today:
+        # No previous data, just use fresh
+        return new_data
 
     # Build merged: start with old slots, overwrite with new by matching time
     merged_slots = {s["time"]: s for s in old_today}
