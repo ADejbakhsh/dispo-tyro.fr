@@ -7,7 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Scrapes real-time reservation/availability data for the **TYROLIENNE** (zip line) activity at Colmiane from the Axess Shop ticketing platform. Two deliverables:
 
 - **Python client** (`api_client.py`) — fetches data from the Axess Shop and exports to JSON
-- **Static dashboard** (`index.html`) — renders the JSON as hero cards (yesterday/today/tomorrow), an interactive chart, and an upcoming-days strip
+- **Static dashboard** (`index.html`) — renders the JSON as hero cards (yesterday/today/tomorrow), an interactive chart, an upcoming-days strip, and two sticky side banners (left: alert, right: upcoming features) on desktop (≥900px)
+
+### Dashboard layout
+
+- **`.page`** flex wrapper: `[banner-left] [dashboard] [banner-right]` side-by-side on desktop
+- **Banners** are `<aside class="banniere">` with `position: sticky; top: 1.75rem`. Both hidden below 900px via `display: none`.
+- Main dashboard container `.dashboard` has `max-width: 780px`; on mobile (≤540px) tighter padding applies
+- Chart rendered in pure JS as inline SVG, no charting library
 
 ## Commands
 
