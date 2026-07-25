@@ -333,14 +333,14 @@
     width: 100%;
   }
 
-  /* ── Banner (desktop side rails) ── */
+  /* ── Banner (desktop left rail) ── */
   .banniere {
     width: 180px;
     flex-shrink: 0;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 22px 16px 20px;
+    padding: 18px 14px;
     position: sticky;
     top: 1.75rem;
     box-shadow: 4px 4px 0 rgba(0,0,0,0.06);
@@ -351,7 +351,7 @@
     content: "";
     display: block;
     height: 8px;
-    margin: -22px -16px 0;
+    margin: -18px -14px 0;
     background: repeating-linear-gradient(
       45deg,
       var(--red),
@@ -372,22 +372,19 @@
   }
 
   .banniere .titre {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 900;
     color: var(--red);
-    line-height: 1.1;
-    margin: 6px 0 14px;
+    line-height: 1.05;
+    margin: 6px 0 12px;
     text-transform: uppercase;
     letter-spacing: -0.5px;
   }
 
   .banniere .corps {
     font-size: 11.5px;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--text);
-    overflow-wrap: break-word;
-    word-break: break-word;
-    hyphens: auto;
   }
 
   .banniere .corps strong {
