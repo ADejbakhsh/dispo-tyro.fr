@@ -334,7 +334,9 @@ class AxessShopClient:
             minutes = total_minutes % 60
             time_str = f"{hours:02d}:{minutes:02d}"
             available = entry.get("availableSlots", 0)
-            total = entry.get("total", 0)
+            # The API sometimes returns total=39 (the TimeSlotGroup's MaxSlots)
+            # instead of the per-slot capacity (16). Cap it.
+            total = min(entry.get("total", 0), 16)
 
             slots.append({
                 "time": time_str,
