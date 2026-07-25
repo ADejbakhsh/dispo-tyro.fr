@@ -324,114 +324,6 @@
     .hero-minibar-fill { transition: none; }
   }
 
-  /* ── Page wrapper (banner + dashboard side by side) ── */
-  .page {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 1.5rem;
-    width: 100%;
-  }
-
-  /* ── Banner (desktop left rail) ── */
-  .banniere {
-    width: 180px;
-    flex-shrink: 0;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 14px;
-    position: sticky;
-    top: 1.75rem;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.06);
-    font-family: 'DM Sans', system-ui, sans-serif;
-  }
-
-  .banniere::before {
-    content: "";
-    display: block;
-    height: 8px;
-    margin: -18px -14px 0;
-    background: repeating-linear-gradient(
-      45deg,
-      var(--red),
-      var(--red) 10px,
-      #fff 10px,
-      #fff 20px
-    );
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-
-  .banniere .tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--red);
-    font-weight: 700;
-    margin-top: 12px;
-  }
-
-  .banniere .titre {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--red);
-    line-height: 1.05;
-    margin: 6px 0 12px;
-    text-transform: uppercase;
-    letter-spacing: -0.5px;
-  }
-
-  .banniere .corps {
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: var(--text);
-  }
-
-  .banniere .corps strong {
-    color: var(--red);
-    font-weight: 700;
-  }
-
-  .banniere .signature {
-    margin-top: 14px;
-    padding-top: 8px;
-    border-top: 1px dashed var(--border);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 1px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  .banniere .tampon {
-    display: inline-block;
-    margin-top: 10px;
-    border: 2px solid var(--red);
-    color: var(--red);
-    font-size: 9px;
-    font-weight: 700;
-    padding: 3px 6px;
-    transform: rotate(-6deg);
-    letter-spacing: 1px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Right banner: flip shadow direction */
-  .banniere.droite {
-    box-shadow: -4px 4px 0 rgba(0,0,0,0.06);
-  }
-
-  /* Hide banner below 900px */
-  @media (max-width: 900px) {
-    .page {
-      flex-direction: column;
-      align-items: center;
-    }
-    .banniere {
-      display: none;
-    }
-  }
-
   /* ── Mobile ── */
   @media (max-width: 540px) {
     body { padding: 1rem 0.875rem 2rem; }
@@ -446,17 +338,6 @@
 </style>
 </head>
 <body>
-<div class="page">
-
-  <!-- Bannière manifeste -->
-  <aside class="banniere">
-    <div class="tag">⚠ ALERTE ROUGE</div>
-    <div class="titre">Un client a survécu sans hurler</div>
-    <div class="corps">
-      Les Bleus de la <strong>Tyrolienne de La Colmiane</strong> exigent une contre-expertise immédiate.
-    </div>
-  </aside>
-
 <div class="dashboard">
 
   <!-- Header -->
@@ -505,19 +386,6 @@
     <a href="https://colmiane.axess.shop/fr/Products/Tickets/Calendar/529/63/1122" target="_blank" rel="noopener">colmiane.axess.shop →</a>
   </footer>
 </div>
-
-  <!-- Bannière features à venir -->
-  <aside class="banniere droite">
-    <div class="tag">🔮 À VENIR</div>
-    <div class="titre">Fonctionnalités en approche</div>
-    <div class="corps">
-      <strong>1.</strong> Prévision simple de la fréquentation<br>
-      <strong>2.</strong> Prévision augmentée via <strong>météo</strong> & <strong>événements</strong> locaux<br>
-      <strong>3.</strong> Alerte automatique sur la <strong>prochaine grosse date</strong> lointaine
-    </div>
-  </aside>
-
-</div><!-- .page -->
 
 <script>
 /* ── State ── */
