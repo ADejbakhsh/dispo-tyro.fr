@@ -2,9 +2,9 @@
   "2026-07-29": [
     {
       "time": "10:00",
-      "available": 13,
+      "available": 12,
       "max": 16,
-      "reserved": 3
+      "reserved": 4
     },
     {
       "time": "10:30",
@@ -50,9 +50,9 @@
     },
     {
       "time": "14:30",
-      "available": 8,
+      "available": 5,
       "max": 16,
-      "reserved": 8
+      "reserved": 11
     },
     {
       "time": "15:00",
@@ -68,9 +68,9 @@
     },
     {
       "time": "16:00",
-      "available": 12,
+      "available": 8,
       "max": 16,
-      "reserved": 4
+      "reserved": 8
     }
   ],
   "2026-07-30": [
@@ -198,9 +198,9 @@
     },
     {
       "time": "14:30",
-      "available": 16,
+      "available": 14,
       "max": 16,
-      "reserved": 0
+      "reserved": 2
     },
     {
       "time": "15:00",
@@ -1183,5 +1183,5 @@
       "reserved": 12
     }
   ],
-  "_exported_at": "2026-07-28T16:53:04.735986"
+  "_exported_at": "2026-07-28T18:53:38.066494"
 }
