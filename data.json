@@ -2,9 +2,9 @@
   "2026-08-06": [
     {
       "time": "10:00",
-      "available": 14,
+      "available": 13,
       "max": 16,
-      "reserved": 2
+      "reserved": 3
     },
     {
       "time": "10:30",
@@ -136,12 +136,6 @@
     },
     {
       "time": "15:30",
-      "available": 16,
-      "max": 16,
-      "reserved": 0
-    },
-    {
-      "time": "16:00",
       "available": 16,
       "max": 16,
       "reserved": 0
@@ -1183,5 +1177,5 @@
       "reserved": 9
     }
   ],
-  "_exported_at": "2026-08-06T06:51:32.359097"
+  "_exported_at": "2026-08-06T08:51:58.813872"
 }
