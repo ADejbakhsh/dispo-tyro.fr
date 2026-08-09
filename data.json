@@ -32,27 +32,27 @@
     },
     {
       "time": "13:00",
-      "available": 2,
+      "available": 1,
       "max": 16,
-      "reserved": 14
+      "reserved": 15
     },
     {
       "time": "13:30",
-      "available": 15,
+      "available": 6,
       "max": 16,
-      "reserved": 1
+      "reserved": 10
     },
     {
       "time": "14:00",
-      "available": 9,
-      "max": 15,
-      "reserved": 6
+      "available": 1,
+      "max": 16,
+      "reserved": 15
     },
     {
       "time": "14:30",
-      "available": 15,
+      "available": 11,
       "max": 16,
-      "reserved": 1
+      "reserved": 5
     },
     {
       "time": "15:00",
@@ -62,15 +62,15 @@
     },
     {
       "time": "15:30",
-      "available": 14,
+      "available": 8,
       "max": 16,
-      "reserved": 2
+      "reserved": 8
     },
     {
       "time": "16:00",
-      "available": 0,
+      "available": 4,
       "max": 6,
-      "reserved": 6
+      "reserved": 2
     }
   ],
   "2026-08-10": [
@@ -100,9 +100,9 @@
     },
     {
       "time": "12:00",
-      "available": 14,
+      "available": 10,
       "max": 16,
-      "reserved": 2
+      "reserved": 6
     },
     {
       "time": "13:00",
@@ -290,9 +290,9 @@
     },
     {
       "time": "16:00",
-      "available": 16,
+      "available": 14,
       "max": 16,
-      "reserved": 0
+      "reserved": 2
     }
   ],
   "2026-08-13": [
@@ -470,9 +470,9 @@
     },
     {
       "time": "12:00",
-      "available": 16,
+      "available": 14,
       "max": 16,
-      "reserved": 0
+      "reserved": 2
     },
     {
       "time": "13:00",
@@ -1044,15 +1044,15 @@
     },
     {
       "time": "10:30",
-      "available": 9,
+      "available": 8,
       "max": 16,
-      "reserved": 7
+      "reserved": 8
     },
     {
       "time": "11:00",
-      "available": 16,
+      "available": 13,
       "max": 16,
-      "reserved": 0
+      "reserved": 3
     },
     {
       "time": "11:30",
@@ -1183,5 +1183,5 @@
       "reserved": 4
     }
   ],
-  "_exported_at": "2026-08-09T11:25:34.373943"
+  "_exported_at": "2026-08-09T12:51:33.662602"
 }
