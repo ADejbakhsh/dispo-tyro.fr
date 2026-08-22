@@ -97,6 +97,14 @@ class AxessShopClient:
     TICKET_TYPE_ID = 1122
     SUB_TYPE_ID = 1061  # Person type identifier for TYROLIENNE
 
+    # Capacity handling for per-slot parsing. Real per-slot totals vary by
+    # season (6, 10, 14, 15, 16, 18 places observed). The API occasionally
+    # returns the TimeSlotGroup's MaxSlots (e.g. 39) for the first slot
+    # instead of the real per-slot total — anything above the realistic
+    # ceiling is treated as bogus and replaced with the nominal capacity.
+    NOMINAL_SLOT_CAPACITY = 16
+    MAX_REALISTIC_SLOT_CAPACITY = 24
+
     def __init__(
         self,
         session_id: Optional[str] = None,
@@ -334,15 +342,26 @@ class AxessShopClient:
             minutes = total_minutes % 60
             time_str = f"{hours:02d}:{minutes:02d}"
             available = entry.get("availableSlots", 0)
-            # The API sometimes returns total=39 (the TimeSlotGroup's MaxSlots)
-            # instead of the per-slot capacity (16). Cap it.
-            total = min(entry.get("total", 0), 16)
+            raw_total = entry.get("total", 0)
+
+            # Per-slot capacity legitimately varies by season (6-18 places).
+            # The API occasionally returns the TimeSlotGroup's MaxSlots
+            # (e.g. 39) for the first slot instead of the real per-slot
+            # capacity — treat those outliers as the nominal capacity.
+            if raw_total > AxessShopClient.MAX_REALISTIC_SLOT_CAPACITY:
+                total = AxessShopClient.NOMINAL_SLOT_CAPACITY
+            else:
+                total = raw_total
+
+            # The site can report more available slots than capacity
+            # (e.g. after cancellations); never emit a negative count.
+            reserved = max(0, total - available)
 
             slots.append({
                 "time": time_str,
                 "available": available,
                 "max": total,
-                "reserved": total - available,
+                "reserved": reserved,
             })
 
         # Sort by time
@@ -379,7 +398,7 @@ class AxessShopClient:
         for entry in data:
             valid_from = entry.get("ValidFrom")
             tariff = entry.get("Tariff")
-            slots_info = entry.get("TimeSlotInfo", [])
+            slots_info = entry.get("TimeSlotInfo") or []
 
             for slot_group in slots_info:
                 available = slot_group.get("AvailableSlots", 0)
@@ -432,7 +451,7 @@ class AxessShopClient:
                 # Check if date has any availability
                 has_availability = any(
                     sg.get("MaxSlots", 0) > 0
-                    for sg in entry.get("TimeSlotInfo", [])
+                    for sg in (entry.get("TimeSlotInfo") or [])
                 )
 
                 if has_availability:
