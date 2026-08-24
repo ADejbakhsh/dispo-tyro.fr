@@ -19,8 +19,10 @@ The Contingent (time-slot) page mirrors the Calendar URL:
   /fr/Products/Tickets/Contingent/{ProjNr}/{PoolNr}/{TicketTypeId}
 """
 
+import os
 import re
 import json
+import shutil
 from datetime import datetime, date, timedelta
 from typing import Optional
 from urllib.parse import urlparse
@@ -498,11 +500,43 @@ def _merge_today_slots(old_data: dict, new_data: dict) -> dict:
     # Build merged: start with old slots, overwrite with new by matching time
     merged_slots = {s["time"]: s for s in old_today}
     for s in new_today:
+        old_s = merged_slots.get(s["time"])
+        if old_s is not None and s["reserved"] < old_s["reserved"]:
+            # Fail-safe: a reserved count should not shrink within a day.
+            # If the server glitches and reports fewer reservations, keep
+            # the highest count seen so far.
+            s = dict(s, reserved=old_s["reserved"])
         merged_slots[s["time"]] = s  # new data wins for same time
 
     result = dict(new_data)  # copy — all non-today dates from fresh fetch
     result[today_str] = sorted(merged_slots.values(), key=lambda s: s["time"])
     return result
+
+
+def _load_previous_export(filepath: str) -> dict:
+    """Load a previous export, falling back to the .bak copy.
+
+    Returns an empty dict when no usable previous export exists.
+    Metadata keys (starting with "_") are stripped.
+    """
+    for path in (filepath, filepath + ".bak"):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return {k: v for k, v in data.items() if not k.startswith("_")}
+        except (OSError, json.JSONDecodeError):
+            continue
+    return {}
+
+
+def _atomic_write_json(filepath: str, data: dict) -> None:
+    """Write JSON atomically (temp file + rename) so an interrupted write
+    can never leave a truncated/corrupt data.json behind."""
+    tmp_path = filepath + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp_path, filepath)
 
 
 def export_to_json(client: AxessShopClient = None, filepath: str = "data.json",
@@ -539,36 +573,48 @@ def export_to_json(client: AxessShopClient = None, filepath: str = "data.json",
         else:
             print(f"  {date_str}: No data")
 
-    # Merge today's slots with previous export to preserve past time slots.
-    # Also carry forward yesterday's data — the API stops returning slots
-    # for past dates, but we want the final reservation count for display.
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            old_data = json.load(f)
-        # Remove metadata keys before merging
-        old_data = {k: v for k, v in old_data.items() if not k.startswith("_")}
+    # ── Merge with previous export (fail-safe history) ─────────────
+    # The API stops returning slots for past dates, and occasionally the
+    # record of a day is lost between exports (missed run, server glitch).
+    # To make the dashboard resilient:
+    #   1. Load the previous export (or its .bak copy if missing/corrupt).
+    #   2. Merge today's slots (the server drops elapsed slots as the day
+    #      goes on — the merge preserves the morning slots).
+    #   3. Carry forward ALL past dates from the previous export, so the
+    #      reservation history survives even if one or more exports are
+    #      skipped or a day's record disappears server-side.
+    today_str = date.today().isoformat()
+    old_data = _load_previous_export(filepath)
+    if old_data:
         merged = _merge_today_slots(old_data, clean)
 
-        merged_count = len(merged.get(date.today().isoformat(), []))
-        clean_count = len(clean.get(date.today().isoformat(), []))
+        merged_count = len(merged.get(today_str, []))
+        clean_count = len(clean.get(today_str, []))
         if merged_count > clean_count:
             print(f"  Preserved {merged_count - clean_count} past slot(s) for today from previous export")
 
-        # Preserve yesterday's data (API stops returning past dates)
-        yesterday_str = (date.today() - timedelta(days=1)).isoformat()
-        if yesterday_str in old_data and yesterday_str not in merged:
-            merged[yesterday_str] = old_data[yesterday_str]
-            print(f"  Preserved yesterday's data ({yesterday_str}) from previous export")
+        # Carry forward every past date the fresh fetch no longer returns
+        restored = 0
+        for date_str, slots in old_data.items():
+            if date_str < today_str and date_str not in merged:
+                merged[date_str] = slots
+                restored += 1
+        if restored:
+            print(f"  Carried forward {restored} past day(s) from previous export")
 
         clean = merged
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass  # no previous data to merge, use fresh data as-is
 
     # Embed export timestamp for the dashboard
     clean["_exported_at"] = datetime.now().isoformat()
 
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(clean, f, ensure_ascii=False, indent=2)
+    # Keep a backup of the last good export before overwriting, then write
+    # atomically (tmp + rename) so a crash can never corrupt data.json.
+    if old_data:
+        try:
+            shutil.copy2(filepath, filepath + ".bak")
+        except OSError:
+            pass
+    _atomic_write_json(filepath, clean)
 
     total_dates = len([k for k in clean if not k.startswith("_")])
     total_slots = sum(len(v) for k, v in clean.items() if not k.startswith("_"))

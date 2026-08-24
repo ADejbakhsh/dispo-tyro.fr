@@ -297,6 +297,14 @@
     height: 100%;
     border-radius: 1.5px;
   }
+  .day-chip-closed {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.95;
+  }
 
   /* ── Empty ── */
   .empty-note {
@@ -425,6 +433,27 @@ function pctClass(pct) {
   return '';
 }
 
+/* ── Off-season (weekends only until December) ── */
+// During off-season the zip line normally only runs on weekends, so a
+// weekday with no data means nobody could have booked anyway — say that
+// instead of showing a bare "no data".
+const OFF_SEASON_END = { month: 12, day: 1 }; // daily operation resumes Dec 1st
+function isOffSeason(dateIso) {
+  const d = parseDate(dateIso);
+  const end = new Date(d.getFullYear(), OFF_SEASON_END.month - 1, OFF_SEASON_END.day);
+  return d < end;
+}
+function isWeekend(dateIso) {
+  const day = parseDate(dateIso).getDay();
+  return day === 0 || day === 6; // Sunday or Saturday
+}
+function closedReason(dateIso) {
+  if (isOffSeason(dateIso) && !isWeekend(dateIso)) {
+    return 'Fermé — hors saison, ouvert les week-ends uniquement';
+  }
+  return null;
+}
+
 /* ── Load ── */
 let lastFetchTime = null;
 const AUTO_REFRESH_MS = 4 * 60 * 60 * 1000; // 4 hours
@@ -469,7 +498,9 @@ async function loadAll(showFeedback = false) {
       }
     }
   } else if (sortedDates.length > 0) {
-    selectedDate = sortedDates[0];
+    // Carried-forward history means sortedDates[0] may be a past day —
+    // prefer the first date from today onwards.
+    selectedDate = sortedDates.find(d => d >= today) || sortedDates[sortedDates.length - 1];
   } else {
     selectedDate = null;
   }
@@ -524,8 +555,15 @@ function renderHero() {
     let numHtml, subHtml, barHtml = '';
 
     if (!t || t.max === 0) {
+      const closed = closedReason(dateIso);
       numHtml = `<div class="hero-number is-none">—</div>`;
-      subHtml = `<div class="hero-sub">Pas de données</div>`;
+      if (closed) {
+        subHtml = `<div class="hero-sub">${closed}</div>`;
+      } else if (label === 'Demain') {
+        subHtml = `<div class="hero-sub">En attente…</div>`;
+      } else {
+        subHtml = `<div class="hero-sub">Pas de données</div>`;
+      }
     } else {
       const numCls = pctClass(t.pct);
       numHtml = `<div class="hero-number ${numCls}">${t.reserved}</div>`;
@@ -543,16 +581,6 @@ function renderHero() {
     `;
     $heroRow.appendChild(card);
   });
-
-  // If tomorrow not in data, mark it
-  if (!tomorrow) {
-    const tomorrowCard = $heroRow.querySelector('.tomorrow');
-    if (tomorrowCard) {
-      tomorrowCard.querySelector('.hero-number').textContent = '—';
-      tomorrowCard.querySelector('.hero-number').className = 'hero-number is-none';
-      tomorrowCard.querySelector('.hero-sub').innerHTML = 'En attente…';
-    }
-  }
 }
 
 /* ── Line chart (today's slots) ── */
@@ -591,7 +619,7 @@ function renderChart() {
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('fill', 'var(--muted)'); text.setAttribute('font-size', '12');
     text.setAttribute('font-family', 'DM Sans, sans-serif');
-    text.textContent = 'Aucune donnée pour le graphique.';
+    text.textContent = (chartDate && closedReason(chartDate)) || 'Aucune donnée pour le graphique.';
     svg.appendChild(text);
     return;
   }
@@ -715,13 +743,17 @@ function renderUpcoming() {
 
     const chip = document.createElement('div');
     chip.className = `day-chip${isActive ? ' active' : ''}`;
-    chip.title = t ? `${t.reserved}/${t.max} réservés` : 'Pas de données';
 
     let numHtml, barHtml;
     if (!t || t.max === 0) {
-      numHtml = `<div class="day-chip-num" style="color:var(--muted)">—</div>`;
+      const closed = closedReason(dateIso);
+      chip.title = closed || 'Pas de données';
+      numHtml = closed
+        ? `<div class="day-chip-closed">fermé</div>`
+        : `<div class="day-chip-num" style="color:var(--muted)">—</div>`;
       barHtml = '';
     } else {
+      chip.title = `${t.reserved}/${t.max} réservés`;
       const numCls = pctClass(t.pct);
       numHtml = `<div class="day-chip-num" style="color:${t.pct >= 0.9 ? 'var(--red)' : t.pct >= 0.7 ? 'var(--warn)' : 'var(--text)'}">${t.reserved}</div>`;
       const barCls = pctClass(t.pct);
