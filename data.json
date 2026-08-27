@@ -204,9 +204,9 @@
     },
     {
       "time": "15:00",
-      "available": 16,
+      "available": 14,
       "max": 16,
-      "reserved": 0
+      "reserved": 2
     },
     {
       "time": "15:30",
@@ -659,5 +659,5 @@
       "reserved": 15
     }
   ],
-  "_exported_at": "2026-08-27T23:28:30.250694"
+  "_exported_at": "2026-08-28T01:28:02.598749"
 }
