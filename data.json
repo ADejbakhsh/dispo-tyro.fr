@@ -1,78 +1,4 @@
 {
-  "2026-08-30": [
-    {
-      "time": "10:00",
-      "available": 14,
-      "max": 15,
-      "reserved": 1
-    },
-    {
-      "time": "10:30",
-      "available": 13,
-      "max": 16,
-      "reserved": 3
-    },
-    {
-      "time": "11:00",
-      "available": 7,
-      "max": 16,
-      "reserved": 9
-    },
-    {
-      "time": "11:30",
-      "available": 3,
-      "max": 15,
-      "reserved": 12
-    },
-    {
-      "time": "12:00",
-      "available": 1,
-      "max": 16,
-      "reserved": 15
-    },
-    {
-      "time": "13:00",
-      "available": 1,
-      "max": 16,
-      "reserved": 15
-    },
-    {
-      "time": "13:30",
-      "available": 3,
-      "max": 16,
-      "reserved": 13
-    },
-    {
-      "time": "14:00",
-      "available": 1,
-      "max": 16,
-      "reserved": 15
-    },
-    {
-      "time": "14:30",
-      "available": 0,
-      "max": 16,
-      "reserved": 16
-    },
-    {
-      "time": "15:00",
-      "available": 9,
-      "max": 16,
-      "reserved": 7
-    },
-    {
-      "time": "15:30",
-      "available": 9,
-      "max": 16,
-      "reserved": 7
-    },
-    {
-      "time": "16:00",
-      "available": 10,
-      "max": 16,
-      "reserved": 6
-    }
-  ],
   "2026-09-06": [
     {
       "time": "10:00",
@@ -118,9 +44,9 @@
     },
     {
       "time": "14:00",
-      "available": 13,
+      "available": 11,
       "max": 16,
-      "reserved": 3
+      "reserved": 5
     },
     {
       "time": "14:30",
@@ -275,6 +201,80 @@
       "available": 12,
       "max": 16,
       "reserved": 4
+    }
+  ],
+  "2026-08-30": [
+    {
+      "time": "10:00",
+      "available": 14,
+      "max": 15,
+      "reserved": 1
+    },
+    {
+      "time": "10:30",
+      "available": 13,
+      "max": 16,
+      "reserved": 3
+    },
+    {
+      "time": "11:00",
+      "available": 7,
+      "max": 16,
+      "reserved": 9
+    },
+    {
+      "time": "11:30",
+      "available": 3,
+      "max": 15,
+      "reserved": 12
+    },
+    {
+      "time": "12:00",
+      "available": 1,
+      "max": 16,
+      "reserved": 15
+    },
+    {
+      "time": "13:00",
+      "available": 1,
+      "max": 16,
+      "reserved": 15
+    },
+    {
+      "time": "13:30",
+      "available": 3,
+      "max": 16,
+      "reserved": 13
+    },
+    {
+      "time": "14:00",
+      "available": 1,
+      "max": 16,
+      "reserved": 15
+    },
+    {
+      "time": "14:30",
+      "available": 0,
+      "max": 16,
+      "reserved": 16
+    },
+    {
+      "time": "15:00",
+      "available": 9,
+      "max": 16,
+      "reserved": 7
+    },
+    {
+      "time": "15:30",
+      "available": 9,
+      "max": 16,
+      "reserved": 7
+    },
+    {
+      "time": "16:00",
+      "available": 10,
+      "max": 16,
+      "reserved": 6
     }
   ],
   "2026-08-29": [
@@ -795,5 +795,5 @@
       "reserved": 15
     }
   ],
-  "_exported_at": "2026-08-30T15:29:20.546412"
+  "_exported_at": "2026-08-30T17:28:36.808850"
 }
