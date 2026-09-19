@@ -1,72 +1,4 @@
 {
-  "2026-09-19": [
-    {
-      "time": "10:00",
-      "available": 16,
-      "max": 16,
-      "reserved": 0
-    },
-    {
-      "time": "10:30",
-      "available": 12,
-      "max": 16,
-      "reserved": 4
-    },
-    {
-      "time": "11:00",
-      "available": 12,
-      "max": 16,
-      "reserved": 4
-    },
-    {
-      "time": "11:30",
-      "available": 2,
-      "max": 16,
-      "reserved": 14
-    },
-    {
-      "time": "12:00",
-      "available": 6,
-      "max": 16,
-      "reserved": 10
-    },
-    {
-      "time": "13:00",
-      "available": 5,
-      "max": 16,
-      "reserved": 11
-    },
-    {
-      "time": "13:30",
-      "available": 14,
-      "max": 16,
-      "reserved": 2
-    },
-    {
-      "time": "14:00",
-      "available": 16,
-      "max": 16,
-      "reserved": 0
-    },
-    {
-      "time": "14:30",
-      "available": 6,
-      "max": 16,
-      "reserved": 10
-    },
-    {
-      "time": "15:00",
-      "available": 5,
-      "max": 16,
-      "reserved": 11
-    },
-    {
-      "time": "15:30",
-      "available": 12,
-      "max": 16,
-      "reserved": 4
-    }
-  ],
   "2026-09-20": [
     {
       "time": "10:00",
@@ -330,6 +262,74 @@
       "time": "15:30",
       "available": 2,
       "max": 6,
+      "reserved": 4
+    }
+  ],
+  "2026-09-19": [
+    {
+      "time": "10:00",
+      "available": 16,
+      "max": 16,
+      "reserved": 0
+    },
+    {
+      "time": "10:30",
+      "available": 12,
+      "max": 16,
+      "reserved": 4
+    },
+    {
+      "time": "11:00",
+      "available": 12,
+      "max": 16,
+      "reserved": 4
+    },
+    {
+      "time": "11:30",
+      "available": 2,
+      "max": 16,
+      "reserved": 14
+    },
+    {
+      "time": "12:00",
+      "available": 6,
+      "max": 16,
+      "reserved": 10
+    },
+    {
+      "time": "13:00",
+      "available": 5,
+      "max": 16,
+      "reserved": 11
+    },
+    {
+      "time": "13:30",
+      "available": 14,
+      "max": 16,
+      "reserved": 2
+    },
+    {
+      "time": "14:00",
+      "available": 16,
+      "max": 16,
+      "reserved": 0
+    },
+    {
+      "time": "14:30",
+      "available": 6,
+      "max": 16,
+      "reserved": 10
+    },
+    {
+      "time": "15:00",
+      "available": 5,
+      "max": 16,
+      "reserved": 11
+    },
+    {
+      "time": "15:30",
+      "available": 12,
+      "max": 16,
       "reserved": 4
     }
   ],
@@ -1209,5 +1209,5 @@
       "reserved": 15
     }
   ],
-  "_exported_at": "2026-09-19T14:02:36.403704"
+  "_exported_at": "2026-09-19T15:56:59.859121"
 }
